@@ -3,6 +3,10 @@
     max-width: 300px;
 }
 
+.breed-select.is-hidden {
+    display: none;
+}
+
 .cat-info {
     padding: 40px;
     display: flex;
