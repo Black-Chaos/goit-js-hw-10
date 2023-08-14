@@ -1,17 +1,27 @@
 import { Loading } from 'notiflix/build/notiflix-loading-aio';
 import CatAPIService from './cat-api/cat-api';
-
+import SlimSelect from 'slim-select';
 
 const CatAPI = new CatAPIService();
 
-const catInfo = document.querySelector('.cat-info')
-const select = document.querySelector('.breed-select');
+const catInfo = document.querySelector('.cat-info');
 
-select.addEventListener('change', onChange);
+
+createSelectOptions().then(options => {
+    new SlimSelect({
+      select: document.querySelector('.breed-select'),
+      data: options,
+      settings: {
+        placeholderText: 'Choose one',
+        },
+        events: {
+          afterChange: onChange
+      }
+    });
+})
 
 function createSelectOptions() {
     return CatAPI.fetchBreeds()
-    //   .then(console.log)
       .then(data =>
         data.map(({ id, name }) => {
           const option = document.createElement('option');
@@ -21,13 +31,10 @@ function createSelectOptions() {
         })
       );
 }
-createSelectOptions().then(options => {
-    select.append(...options)
-})
 
-function onChange() {
+function onChange(select) {
     Loading.circle();
-    CatAPI.fetchCatByBreed(select.value)
+    CatAPI.fetchCatByBreed(select[0].value)
         .then(data => {
             renderCatInfo({
                 img: data[0].url,
@@ -40,8 +47,9 @@ function onChange() {
 }
 
 function renderCatInfo({img, name, desc, temp}) {
-    catInfo.innerHTML = `<img src="${img}" alt="cat" width="600">
-      <h2>${name}</h2>
-      <p>${desc}</p>
-      <p>${temp}</p>`;
+    catInfo.innerHTML = `<img src="${img}" alt="cat" width="600"><div class="text-wrap">
+        <h2>${name}</h2>
+        <p>${desc}</p>
+        <p>${temp}</p>
+    </div>`;
 }
